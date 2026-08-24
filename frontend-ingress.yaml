@@ -19,7 +19,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: backend-service
+                name: frontend-service
                 port:
                   number: 3000
 

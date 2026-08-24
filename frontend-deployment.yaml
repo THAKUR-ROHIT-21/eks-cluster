@@ -6,6 +6,7 @@ metadata:
 
 spec:
   replicas: 2
+
   selector:
     matchLabels:
       app: frontend
@@ -17,11 +18,27 @@ spec:
 
     spec:
       containers:
+
+        # Frontend
         - name: frontend
           image: deviliam/ecs-frontend:1
           ports:
             - containerPort: 80
-            
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+        # Backend
+        - name: backend
+          image: deviliam/ecs-backend:1
+          ports:
+            - containerPort: 3000
+
           resources:
             requests:
               cpu: "100m"
