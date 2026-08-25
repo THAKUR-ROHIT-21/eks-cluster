@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: deviliam/ecs-frontend:1.1
+          image: biharibabu1/hireflow-frontend:v1
           ports:
             - containerPort: 80
             
