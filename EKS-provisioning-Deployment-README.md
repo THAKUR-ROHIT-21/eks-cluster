@@ -567,5 +567,104 @@ Frontend Pod       Frontend Pod
    :80                 :80
 ```
 
-## Backend Deployment Pending
+## Backend Deployment 
+```
+kubectl apply -f frontend-ingress.yaml
+
+kubectl apply -f backend-deployment.yaml
+
+kubectl apply -f backend-service.yaml
+
+kubectl get pods -l app=backend -o wide
+
+kubectl logs \
+  $(kubectl get pods -l app=backend -o jsonpath='{.items[0].metadata.name}')
+
+kubectl get svc backend-service
+
+kubectl exec -it \
+$(kubectl get pods -l app=backend -o jsonpath='{.items[0].metadata.name}') \
+-- wget -qO- http://backend-service:3000/api/message
+
+output : {"message":"Hello from the ECS backend task!"}
+
+```
 ## Database Deployment Pending
+
+```
+# ============================================================
+# 0. Verify EBS CSI Driver Add-on
+# ============================================================
+
+aws eks list-addons \
+  --cluster-name second-cluster \
+  --region us-east-1
+
+# If aws-ebs-csi-driver is NOT listed, create it:
+aws eks create-addon \
+  --cluster-name second-cluster \
+  --addon-name aws-ebs-csi-driver \
+  --region us-east-1
+
+# Verify add-on status
+aws eks describe-addon \
+  --cluster-name second-cluster \
+  --addon-name aws-ebs-csi-driver \
+  --region us-east-1 \
+  --query "addon.status" \
+  --output text
+
+kubectl get pods -n kube-system | grep ebs-csi
+
+# ============================================================
+# 1. Secret
+# ============================================================
+
+kubectl apply -f secret.yaml
+kubectl get secret database-secret
+
+
+# ============================================================
+# 2. Persistent Storage
+# ============================================================
+
+kubectl apply -f database-pvc.yaml
+kubectl get pvc database-pvc
+
+# If PVC is Pending
+kubectl get storageclass
+
+
+# ============================================================
+# 3. PostgreSQL Deployment
+# ============================================================
+
+kubectl apply -f database-deployment.yaml
+kubectl get pods -l app=database
+
+# If Pod is not Running
+kubectl describe pod -l app=database
+
+
+# ============================================================
+# 4. PostgreSQL Service
+# ============================================================
+
+kubectl apply -f database-service.yaml
+kubectl get svc database-service
+kubectl get endpoints database-service
+
+
+# ============================================================
+# 5. Connect to PostgreSQL
+# ============================================================
+
+kubectl exec -it \
+$(kubectl get pods -l app=database -o jsonpath='{.items[0].metadata.name}') \
+-- psql -U hireflow -d hireflow
+
+# Inside PostgreSQL
+SELECT current_database();
+SELECT version();
+
+```

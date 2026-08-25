@@ -19,14 +19,23 @@ spec:
     spec:
       containers:
         - name: backend
-          image: deviliam/ecs-backend:1
+          image: deviliam/ecs-backend:1.1
+
           ports:
             - containerPort: 3000
 
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "500m"
-              memory: "256Mi"
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: database-secret
+                  key: DATABASE_URL
+
+            - name: PORT
+              value: "3000"
+
+            - name: NODE_ENV
+              value: "development"
+
+            - name: CORS_ORIGIN
+              value: "*"
