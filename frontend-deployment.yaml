@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: biharibabu1/hireflow-frontend:v1
+          image: biharibabu1/hireflow-frontend:v2
           ports:
             - containerPort: 80
             
